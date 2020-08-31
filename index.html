@@ -19,33 +19,45 @@
     
   <video id="player"  class="video-js vjs-default-skin" width="600" height="300" preload="auto" controls class="video-js vjs-default-skin"></video>
 
-  <script>
+  <script type="text/javascript">
+    fetch('config.json').then(function (response) {
+        return response.json();
+    }).then(function (config) {
+        var streamUrl = config.url;
 
-    // Player parameters
+        // build absolute url
+        if (streamUrl.indexOf('http://') < 0 && streamUrl.indexOf('https://') < 0) {
+            if (streamUrl.indexOf('/') === 0) {
+                streamUrl = location.pathname + streamUrl;
+            } else if (streamUrl.indexOf('/') === 1) {
+                streamUrl = streamUrl.substr(1);
+            }
 
-    var streamUrl = location.protocol 
-                    + '//' 
-                    + location.hostname 
-                    + (location.port ? ':' + location.port : '') 
-                    + '/' 
-                    + '/hls/index.m3u8';
+            streamUrl = location.protocol 
+                + '//' 
+                + location.hostname 
+                + (location.port ? ':' + location.port : '') 
+                + '/' 
+                + streamUrl;
+        }
 
-    var parameters = {
-      sources: [
-                    {
-                        src: streamUrl,
-                        type: 'application/x-mpegURL'
-                    }
-                ],
-                aspectRatio: "16:9",
-                fluid: true,
-                techOrder: ['html5', 'flash']
-    };
+        var parameters = {
+            sources: [
+                {
+                    src: streamUrl,
+                    type: 'application/x-mpegURL'
+                }
+            ],
+            aspectRatio: "16:9",
+            fluid: true,
+            techOrder: ['html5', 'flash']
+        };
 
-    // starts player
-    var player = videojs('player', parameters);
-    player.play();
-  </script>
+        // Configure videojs
+        var player = videojs('player', parameters);
+        player.play();
+    });
+</script>
 
 </body>
 </html>
